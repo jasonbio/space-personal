@@ -1,10 +1,23 @@
-{% extends 'grid.html' %}
+{% extends 'frame.html' %}
 {% block title %}Space - Images{% endblock %}
 {% block content %}
-<h2>Images</h2>
-<p>This page will let you manage your images (ISO's) that you can use to create VM's from. To add a new image, upload it to your image directory (specified on the <a href="/host">host page</a>). Once the ISO has been uploaded, you can add the image manually using the form below, or use the <a href="/utils/import_images">import images</a> feature to import it automatically.</p>
+<div class="row">
+    <div class="col-md-12">
+        <div class="page-header">
+            <h2>Local Images</h2>
+        </div>
+    </div>
+</div>
+<p>This page will let you manage your images (ISO's) that you can use to create local servers from. To add a new image, upload it to your image directory (specified on the <a href="/settings">settings page</a>). Once the ISO has been uploaded, you can add the image manually using the form below, or use the <a href="/utils/import_images">import images</a> feature to import it automatically.</p>
 <hr/>
-<h3>Existing Images</h3>
+<div role="tabpanel">
+    <ul class="nav nav-tabs" role="tablist" id="tabs">
+        <li role="presentation" class="active"><a href="#images" data-toggle="tab">Images</a></li>
+        <li role="presentation"><a href="#addimage" data-toggle="tab">Add Image</a></li>
+    </ul>
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active fade in" id="images">
+        <h3>Existing Images</h3>
 <p>Deleting an image here will <strong>not</strong> remove it from your filesystem, it must be deleted manually.</p>
 <table class="table">
     <tr>
@@ -22,7 +35,8 @@
         </tr>
     {% endfor %}
 </table>
-<hr/>
+        </div>
+        <div role="tabpanel" class="tab-pane active fade" id="addimage">
 <h3>Add New Images</h3>
 <p>This will add an image that already exists on your filesystem to the database for use by VM's. The image must be put in the images directory before the image will actually work.</p>
 <form action="/images" method="post" data-toggle="validator" role="form">
@@ -43,4 +57,8 @@
     </div>
     <input class="btn btn-success" type="submit" value="Add"/>
 </form>
+
+        </div>
+    </div>
+</div><!-- tab panel !-->
 {% endblock %}

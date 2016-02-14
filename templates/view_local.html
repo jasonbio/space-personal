@@ -1,0 +1,233 @@
+{% extends 'frame.html' %}
+{% block title %}Space - Edit {{ server.name }}{% endblock %}
+{% block header %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/droplet.css') }}"/>
+{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="page-header">
+        <h2><img src="{{ url_for('static', filename='images/local_logo.png') }}" title="Local Machine" alt="Local Machine"/>&nbsp;Local - {{ server[0]['name'] }}</h2>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <div class="panel panel-warning">
+            <div class="panel-heading">
+                <h4 class="panel-title">Details</h4>
+            </div><!-- panel heading !-->
+            <div class="row">
+                <div class="col-md-12">
+                    <table class="table table-user-information table-striped">
+                        <tbody>
+                            <tr/>
+                                <td>ID:</td>
+                                <td>{{ server[0]['_id'] }}</td>
+                            <tr>
+                            <tr>
+                                <td>Name:</td>
+                                <td>{{ server[0]['name'] }}</td>
+                            </tr>
+                            <tr>
+                                <td>Status:</td>
+                                <td>
+                                    {% if server[0]['state'] == 1 %}
+                                    Running
+                                    {% elif server[0]['state'] == 0 %}
+                                    Stopped
+                                    {% else %}
+                                    Unknown
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>RAM:</td>
+                                <td>{{ server[0]['ram'] }}MB</td>
+                            </tr>
+                            <tr>
+                                <td>vCPU:</td>
+                                <td>{{ server[0]['vcpu'] }}</td>
+                            </tr>
+                            <tr>
+                                <td>Disk:</td>
+                                <td>{{ server[0]['disk_size'] }}GB</td>
+                            </tr>
+                            <tr>
+                                <td>Disk Path:</td>
+                                <td>{{ server[0]['disk_path'] }}</td>
+                            </tr>
+                            <tr>
+                                <td>Distribution:</td>
+                                <td>{{ server[0]['disk_image'] }}</td>
+                            </tr>
+                            <tr>
+                                <td>Boot Device:</td>
+                                <td>{{ server[0]['bootdev'] }}</td>
+                            </tr>
+                            <tr>
+                                <td>MAC:</td>
+                                <td>{{ server[0]['mac_address'] }}</td>
+                            </tr>
+                            <tr>
+                                <td>IP:</td>
+                                <td><a href="ssh://root@{{ server[0]['ip'] }}">{{ server[0]['ip'] }}</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div><!-- col-12 !-->
+            </div><!-- row !-->
+        </div><!-- panel !-->
+    </div><!-- md-6 !-->
+    <div class="col-md-6">
+        <div role="tabpanel">
+            <ul class="nav nav-tabs" role="tablist" id="tabs">
+                <li role="presentation" class="active"><a href="#actions" data-toggle="tab">Actions</a></li>
+                <li role="presentation"><a href="#configuration" data-toggle="tab">Configuration</a></li>
+                <li role="presentation"><a href="#storage" data-toggle="tab">Storage</a></li>
+                <li role="presentation"><a href="#networking" data-toggle="tab">Networking</a></li>
+                <li role="presentation"><a href="#events" data-toggle="tab">Events</a></li>
+            </ul>
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active fade in" id="actions">
+                <h3>Actions</h3>
+                    {% if server[0]['state'] == 1 %}
+                    <a href="/shutdown/{{ server[0]['_id'] }}" class="btn btn-danger">Shutdown Server</a><br/><br/>
+                    <a href="/reboot/{{ server[0]['_id'] }}" class="btn btn-warning">Reboot Server</a><br/><br/>
+                    <a href="/console/{{ server[0]['_id'] }}" class="btn btn-primary">Access Console</a><br/><br/>
+                    {% elif server[0]['state'] == 0 %}
+                    <a href="/start/{{ server[0]['_id'] }}" class="btn btn-success">Start Server</a><br/><br/>
+                    {% endif %}
+                    <a href="/destroy/{{ server[0]['_id'] }}" class="btn btn-danger">Destroy Server</a><br/><br/>
+                    <a href="/redefine/{{ server[0]['_id'] }}" class="btn btn-warning">Redefine Server</a><br/><br/>
+                    <a href="/redefine/{{ server[0]['_id'] }}/bootdev/cdrom" class="btn btn-info">Boot from CDROM</a><br/><br/>
+                    <a href="/redefine/{{ server[0]['_id'] }}/bootdev/hd" class="btn btn-info">Boot from HDD</a><br/><br/>
+                </div><!-- tabpanel !-->
+                <div role="tabpanel" class="tab-pane fade" id="configuration">
+                    <h3>Configuration</h3>
+                    <p>You can modify all of the settings related to the server here. If you want the changes to be pushed to the server, be sure to check the box at the bottom. If you do not want to push the changes immediately, push them at your convenience using the <a href="/redefine/{{ server[0]['_id'] }}">redefine</a> option.</p>
+                    <form action="/server/edit/{{ server[0]['_id'] }}/local" method="post" data-toggle="" role="form">
+                        <div class="form-group">
+                            <label class="control-label">Name</label>
+                            <input class="form-control" type="text" name="name" value="{{ server[0]['name'] }}" required/>
+                            <span class="help-block">The name of your server.</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">MAC Address</label>
+                            <input class="form-control" type="text" name="mac_address" value="{{ server[0]['mac_address'] }}"/>
+                            <span class="help-block">The MAC address of your server. This is obtained automatically, it is not recommended you change this unless you know what you are doing.</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">RAM (MB)</label>
+                            <input class="form-control" type="text" name="ram" value="{{ server[0]['ram'] }}"/>
+                            <span class="help-block">The amount of RAM allocated to your server.</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">vCPU Count</label>
+                            <input class="form-control" type="text" name="vcpu" value="{{ server[0]['vcpu'] }}"/>
+                            <span class="help-block">The number of virtual VPU's allocated to your server.</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Disk Size (GB)</label>
+                            <input class="form-control" type="text" name="disk_size" value="{{ server[0]['disk_size'] }}"/>
+                            <span class="help-block">The amount of storage space allocated to your server. Changing this will not resize your disk currently.</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Disk Path</label>
+                            <input class="form-control" type="text" name="disk_path" value="{{ server[0]['disk_path'] }}"/>
+                            <span class="help-block">The full path to your server's disk image.</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Distribution ISO</label>
+                                <select class="form-control" name="image">
+                                {% for image in images %}
+                                    <option value="{{ image['name'] }}" {% if server[0]['disk_image'] == image['name'] %}selected{% endif %}>{{ image['name'] }}</option>
+                                {% endfor %}
+                                </select>
+                            <span class="help-block">The distribution ISO your server will boot with if not booting in to the server's disk image.</span>
+                        </div>
+                            <div class="form-group">
+                            <label class="control-label">State</label>
+                            <select class="form-control" name="state">
+                                <option value="0" {% if server[0]['state'] == 0 %}selected{% endif %}>Powered Off</option>
+                                <option value="1" {% if server[0]['state'] == 1 %}selected{%endif %}>Running</option>
+                                <option value="3" {% if server[0]['state'] == 3 %}selected{% endif %}>Destroyed</option>
+                            </select>
+                            <span class="help-block">The current state of the server.</span>
+                        </div>
+                        <div class="form-group">
+                            <div class="checkbox" class="form-control"><label><input type="checkbox" name="push" value="1">Push to server (this will restart the server)</label></div>
+                        </div>
+                        <input class="btn btn-success" type="submit" value="Edit"/>
+                    </form>
+                </div><!-- tabpanel !-->
+                <div role="tabpanel" class="tab-pane fade" id="storage">
+                    <h3>Storage</h3>
+                    <p>This option will allow you to increase the size of your server's disk. This will reboot the server.</p>
+                    <form action="/edit/{{ server[0]['_id'] }}/resize" method="post" data-toggle="validator" role="form">
+                        <div class="form-group">
+                            <p>Current Disk Size: {{ server[0]['disk_size'] }} GB</p>
+                            <label class="control-label">Change Disk Size</label>
+                            <input type="number" name="new_size" class="form-control" required min="{{ server[0]['disk_size'] }}"/>
+                            <span class="help-block">The resulting size (after the change) in GB. (Must be larger than current disk)</span>
+                        </div>
+                        <input class="btn btn-success" type="submit" value="Resize"/>
+                    </form>
+                </div><!-- tabpanel !-->
+                <div role="tabpanel" class="tab-pane fade" id="networking">
+                <h3>Networking</h3>
+                <p>You can configure the IP address(es) assigned to your server here. Please note, multiple IP addresses will not work via DHCP - you'll need to configure additional IP addresses manually. Adding an IP address will automatically regenerate the DHCP configuration.</p>
+                <br/>
+                <h4>Existing IP Address</h4>
+                {% if not my_ip %}
+                <h5>This server does not have an IP.</h5>
+                <br/>
+                {% else %}
+                <table class="table">
+                    <tr>
+                        <th>IP Address</th>
+                        <th>Actions</th>
+                    </tr>
+                    <tr>
+                        <td>{{ my_ip[0]['ip'] }}</td>
+                        <td><a href="/ip/unassign/{{ my_ip[0]['_id'] }}" class="btn btn-warning">Unassign</a></td>
+                    </tr>
+                </table>
+                {% endif %}
+                    <h4>Assign IP Address</h4>
+                    <form action="/ip/assign/{{ server[0]['_id'] }}" method="post">
+                        <select name="ip" class="form-control">
+                        {% for ip in ips %}
+                        <option value="{{ ip['_id'] }}">{{ ip['ip'] }}</option>
+                        {% endfor %}
+                        </select><br/>
+                        <input type="submit" value="Assign" class="btn btn-success"/>
+                    </form>
+                </div><!-- tabpanel !-->
+                <div role="tabpanel" class="tab-pane fade" id="events">
+                    <h3>Events</h3>
+                    <table class="table sortable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Completed</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    {% for event in events %}
+                    <tr>
+                        <td>{{ event['date'] }}</td>
+                        <td>{{ event['complete_date'] }}</td>
+                        <td>{% if event['type'] == 1 %}Create{% elif event['type'] == 2 %}Destroy{% elif event['type'] == 3 %}Boot{% elif
+                        event['type'] == 4 %}Shutdown{% elif event['type'] == 5 %}Server is inconsistent{% elif event['type'] == 6 %}Resize{% endif %}</td>
+                        <td>{% if event['status'] == 0 %}Processing{% else %}Complete{% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                    </table>
+                </div><!-- tabpanel !-->
+            </div><!-- tab content !-->
+        </div><!-- tabpanel !-->
+    </div><!-- md-6 !-->
+</div><!-- row !-->
+{% endblock %}

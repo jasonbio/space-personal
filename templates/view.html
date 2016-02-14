@@ -1,44 +1,81 @@
-{% extends 'grid.html' %}
+{% extends 'frame.html' %}
 {% block title %}Space - 
 {% if type == "deleted" %}Deleted Servers
 {% elif type == "active" %}Active Servers
 {% elif type == "all" %}All Servers
+{% elif type == "droplet" %}Droplets
+{% elif type == "linode" %}Linodes
+{% elif type =="local" %}Local Machines
 {% endif %}{% endblock %}
 {% block content %}
+<div class="row">
+<div class="col-md-10">
 {% if type == "all" %}
-<h3>All Servers</h3>
-<p>This is a list of all servers, including active servers and those that have been deleted.</p>
+<h2>Servers - All</h2>
+<p>This is a list of all servers.</p>
 {% elif type == "deleted" %}
-<h3>Deleted Servers</h3>
+<h2>Servers - Deleted</h2>
 <p>This is a list of all servers that have been deleted.</p>
 {% elif type == "active" %}
-<h3>Active Servers</h3>
-<p>This is a list of all active servers.</p>
+<h2>Servers</h2>
+<p>This is a list of all servers.</p>
+{% elif type == "droplet" %}
+<h2>Servers - Droplets</h2>
+<p>This is a list of all Droplets.</p>
+{% elif type == "local" %}
+<h2>Servers - Local</h2>
+<p>This is a list of all local virtual machines.</p>
+{% elif type =="linode" %}
+<h2>Servers - Linodes</h2>
+<p>This is a list of all Linodes.</p>
 {% endif %}
-<div class="btn-group" role="group">
-    <a href="/server/active" class="btn btn-default">Active</a>
-    <a href="/server/deleted" class="btn btn-default">Deleted</a>
-    <a href="/server/all" class="btn btn-default">All</a>
 </div>
-<br/><br/>
-<table class="table sortable">
+<div class="col-md-2" style="text-align:right; margin-top:2em;"><a href="/server/new" class="btn btn-success">Create a Server</a></div>
+<table class="table table-condensed table-hover table-striped table-server sortable">
     <thead>
     <tr>
-        <th>Name</th>
+        <th>Provider</th>
+        <th>Status</th>
+        <th>Server Name</th>
         <th>RAM</th>
-        <th>Disk Size</th>
-        <th>Image</th>
+        <th>Storage</th>
+        <th>IP</th>
     </tr>
     </thead>
     {% if domains %}
     {% for dom in domains %}
+    {% if dom['state'] == 3 %}
+    <tr class="danger">
+    {% else %}
     <tr>
-        <td><a href="/edit/{{ dom['_id'] }}">{{ dom['name'] }}</a></td>
-        <td>{{ dom['ram'] }}</td>
-        <td>{{ dom['disk_size'] }}</td>
-        <td>{{ dom['disk_image'] }}</td>
+    {% endif %}
+        {% if dom['type'] == "do" %}
+        <td><img src="{{ url_for('static', filename='images/do_logo.png') }}" title="DigitalOcean" alt="DigitalOcean"/></td>
+        <td>{% if dom['state'] == 0 %}Off{% elif dom['state'] == 1 %}On{% elif dom['state'] == 3 %}Destroyed{% elif dom['state'] == 2 %}Creating{% endif %}</td>
+        <td><a href="/server/edit/{{ dom['_id'] }}/droplet">{{ dom['name'] }}</a></td>
+        <td>{{ dom['ram'] }}MB</td>
+        <td>{{ dom['disk_size'] }}GB</td>
+        <td>{{ dom['ip'] }}</td>
+        {% elif dom['type'] == "linode" %}
+        <td><img src="{{ url_for('static', filename='images/linode_logo.png') }}" title="Linode" alt="Linode"/></td>
+        <td>{% if dom['state'] == 0 %}Off{% elif dom['state'] == 1 %}On{% elif dom['state'] == 3 %}Destroyed{% endif %}</td>
+        <td><a href="/server/edit/{{ dom['_id'] }}/linode">{{ dom['name'] }}</a></td>
+        <td>{{ dom['ram'] }}MB</td>
+        <td>{{ dom['disk_size'] }}GB</td>
+        <td>{{ dom['ip'] }}</td>
+        {% else %}
+        <td><img src="{{ url_for('static', filename='images/local_logo.png') }}" title="Local Machine" alt="Local Machine"/></td>
+        <td>{% if dom['state'] == 0 %}Off{% elif dom['state'] == 1 %}On{% elif dom['state'] == 3 %}Destroyed{% endif %}
+        <td><a href="/server/edit/{{ dom['_id'] }}/local">{{ dom['name'] }}</a></td>
+        <td>{{ dom['ram'] }}MB</td>
+        <td>{{ dom['disk_size'] }}GB</td>
+        <td>{{ dom['ip'] }}</td>
+        {% endif %}
     </tr>
     {% endfor %}
     {% endif %}
 </table>
+<a href="/utils/import_droplets" class="btn btn-info">Import Droplets</a>
+<a href="/utils/import_linodes" class="btn btn-success">Import Linodes</a>
+</div>
 {% endblock %}

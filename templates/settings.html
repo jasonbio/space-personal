@@ -1,0 +1,167 @@
+{% extends 'frame.html' %}
+{% block title %}Space - Host Configuration{% endblock %}
+{% block header %}
+<script>
+    $(document).ready(function (){
+        $('#tabs').tab();
+    });
+</script>
+{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="page-header">
+            <h2>System Settings</h2>
+        </div>
+    </div>
+</div>
+<div role="tabpanel">
+    <ul class="nav nav-tabs" role="tablist" id="tabs">
+        <li role="presentation" class="active"><a href="#hostconfiguration" data-toggle="tab">Host Configuration</a></li>
+        <li role="presentation"><a href="#credentials" data-toggle="tab">Credentials</a></li>
+        <li role="presentation"><a href="#services" aria-controls="services" role="tab" data-toggle="tab">Services</a></li>
+        <li role="presentation"><a href="#thirdpartyapi" aria-controls="thirdpartyapi" role="tab" data-toggle="tab">Third Party API</a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active fade in" id="hostconfiguration">
+            <h3>Host Configuration</h3>
+            <p>This page will let you change all of the configuration options for your host. These options are initially included in config.py, once the setup has been run you can configure the options here.</p>
+            <form action="/settings" method="post">
+            <div class="form-group">
+                <label class="control-label">Distribution</label>
+                <select class="form-control" name="distribution">
+                    <option value="centos" {% if config['distribution'] == "centos" %}selected{% endif %}>CentOS</option>
+                    <option value="debian" {% if config['distribution'] == "debian" %}selected{% endif %}>Debian</option>
+                    <option value="ubuntu" {% if config['distribution'] == "ubuntu" %}selected{% endif %}>Ubuntu</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="control-label">System Type</label>
+                <select class="form-control" name="system">
+                    <option value="qemu">QEMU</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Domain Name</label>
+                <input class="form-control" type="text" name="domain" value="{{ config['domain'] }}" required/>
+                <span class="help-block">This is the domain name used to access this host.</span>
+            </div>
+            <div class="form-goup">
+                <label class="control-label">Disk Directory</label>
+                <input class="form-control" type="text" name="disk_directory" value="{{ config['disk_directory'] }}" required/>
+                <span class="help-block">This is where the VM's disk images will be stored.</span>
+            </div>
+            <div class="form-group">
+                <label class="form-group">Image Directory</label>
+                <input class="form-control" type="text" name="image_directory" value="{{ config['image_directory'] }}"/>
+                <span class="help-block">This is where the images (ISO's) will be stored.</span>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Config Directory</label>
+                <input class="form-control" type="text" name="config_directory" value="{{ config['config_directory'] }}"/>
+                <span class="help-block">This is where the VM's configuration files will be stored.</span>
+            </div>
+            <div class="form-group">
+                <label class="control-label">DHCP Configuration</label>
+                <input class="form-control" type="text" name="dhcp_configuration" value="{{ config['dhcp_configuration'] }}"/>
+                <span class="help-block">This is the path / name of your DHCP configuration.</span>
+            </div>
+            <div class="form-group">
+                <label class="control-label">DHCP Service</label>
+                <input class="form-control" type="text" name="dhcp_service" value="{{ config['dhcp_service'] }}"/>
+                <span class="help-block">The name of the DHCP service you use. This should be the thing that comes after "service" in a start/restart command.</span>
+            </div>
+            <div class="form-group">
+                <label class="control-label">noVNC Directory</label>
+                <input class="form-control" type="text" name="novnc_directory" value="{{ config['novnc_directory'] }}"/>
+                <span class="help-block">This is the location of the noVNC files. By default this is located in static in the space directory. If you decide to change it, update it here.</span>
+            </div>
+            <div class="form-group">
+                <label class="control-label">noVNC Certificate</label>
+                <input class="form-control" type="text" name="pem_location" value="{{ config['pem_location']  }}"/>
+                <span class="help-block">This is the location of the certificate used by noVNC (pem). By default, this is located in static/noVNC within the space directory.</span>
+            </div>
+            <input class="btn btn-success" type="submit" value="Submit"/>
+            </form>
+        </div>
+        <div role="tabpanel" class="tab-pane fade" id="credentials">
+            <h3>Credentials</h3>
+            <p>This form will allow you to change the password you use to log in to Space.</p>
+            <form action="/login/reset" method="post" data-toggle="validator" role="form">
+                <div class="form-group">
+                    <label class="control-label">New Password</label>
+                    <input type="password" name="password1" class="form-control" id="password1" required/>
+                    <span class="help-block with-errors"></span>
+                </div>
+                <div class="form-group">
+                    <label class="control-label">New Password (Confirm)</label>
+                    <input type="password" name="password2" class="form-control" required data-match="#password1"/>
+                    <span class="help-block with-errors"></span>
+                </div>
+                <input class="btn btn-success" type="submit" value="Submit"/>
+            </form>
+        </div>
+        <div role="tabpanel" class="tab-pane fade" id="services">
+            <h3>Services</h3>
+            <p>You can manage system services using the options here. Some options are not permitted, such as Space and Mongo, because changing these process will prevent Space from functioning normally.
+            Please use the service command from the command line to manage these processes.</p>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Service Name</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for service in services %}
+                    <tr>
+                        <td>{{ service['_id'] }}</td>
+                        <td>
+                        {% if service['status'] == 1 %}
+                        Running
+                        {% else %}
+                        Stopped
+                        {% endif %} 
+                        </td>
+                        <td>
+                            {% if service['_id'] == "celery" %}
+                            <p>Please use "bash /srv/space/scripts/celery.sh" to start Celery.</p>
+                            {% elif service['_id'] == "gunicorn" %}
+                            <p>Please manage Gunicorn/Space from the command line using "service space action".</p>
+                            {% elif service['_id'] == "mongod" %}
+                            <p>Please manage mongod from the command line using "service mongod action".</p>
+                            {% else %}
+                            <a href="/service/{{ service['_id'] }}/stop">Stop</a>
+                            <a href="/service/{{ service['_id'] }}/restart">Restart</a>
+                            <a href="/service/{{ service['_id'] }}/start">Start</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div role="tabpanel" class="tab-pane fade" id="thirdpartyapi">
+            <h3>Integration</h3>
+            <p>Accounts for third party VPS providers.</p>
+            <form action="/settings/providers/do" method="post">
+                <div class="form-group">
+                    <label class="control-label">DigitalOcean API Key</label>
+                    <input type="password" name="do_api" class="form-control"/>
+                </div>
+                <input class="btn btn-success" type="submit" value="Submit"/>
+            </form>
+            <br/><br/>
+            <form action="/settings/providers/linode" method="post">
+                <div class="form-group">
+                    <label class="control-label">Linode API Key</label>
+                    <input type="password" name="linode_api" class="form-control"/>
+                </div>
+            <input class="btn btn-success" type="submit" value="Submit"/>
+            </form>
+        </div>
+    </div><!-- class tab-content !-->
+</div><!-- tabpanel !-->
+{% endblock %}

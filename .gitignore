@@ -1,4 +1,8 @@
+# For pycharm ide
+.idea/
+
 config.py
 *.pyc
 certs/* 
 *.pem
+*.pid

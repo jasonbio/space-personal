@@ -1,0 +1,154 @@
+{% extends 'frame.html' %}
+{% block title %}Space - Edit Linode {{ server[0]['name'] }}{% endblock %}
+{% block header %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/droplet.css') }}"/>
+{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="page-header">
+        <h2 class="type"><img src="{{ url_for('static', filename='images/linode_logo.png') }}" title="Linode" alt="Linode"/>&nbsp;Linode - {{ server[0]['name'] }}</h2>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                <h4 class="panel-title">Details</h4>
+            </div>
+            <div class="row">
+            <div class="col-md-12">
+                <table class="table table-user-information table-striped">
+                    <tbody>
+                        <tr>
+                            <td>Status:</td>
+                            <td>{% if linode['STATUS'] == 1 %}
+                                On
+                                {% else %}
+                                Off
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Plan:</td>
+                            <td>Linode {{ linode['TOTALRAM'] }}</td>
+                        </tr>
+                        <tr>
+                            <td>Location:</td>
+                            {% if linode['DATACENTERID'] == 2 %}
+                            {% set dcid = 0 %}
+                            {% elif linode['DATACENTERID'] == 3 %}
+                            {% set dcid = 1 %}
+                            {% elif linode['DATACENTERID'] == 4 %}
+                            {% set dcid = 2 %}
+                            {% elif linode['DATACENTERID'] == 6 %}
+                            {% set dcid = 3 %}
+                            {% elif linode['DATACENTERID'] == 7 %}
+                            {% set dcid = 4 %}
+                            {% elif linode['DATACENTERID'] == 8 %}
+                            {% set dcid = 5 %}
+                            {% endif %}
+                            <td>{{ linode_facilities[dcid]['location'] }}</td>
+                        </tr>
+                        <tr>
+                            <td>Distribution:</td>
+                            <td>{{ linode['DISTRIBUTIONVENDOR'] }}</td>
+                        </tr>
+                        <tr>
+                            <td>Transfer:</td>
+                            <td>{{ linode['TOTALXFER'] }}MB</td>
+                        </tr>
+                        <tr>
+                            <td>RAM:</td>
+                            <td>{{ linode['TOTALRAM'] }}MB</td>
+                        </tr>
+                        <tr>
+                            <td>Storage:</td>
+                            <td>{{ linode['TOTALHD'] }}MB</td>
+                        </tr>
+                        <tr>
+                            <td>vCPU:</td>
+                            <td>{{ server[0]['vcpu'] }}</td>
+                        </tr>
+                        <tr>
+                            <td>IP:</td>
+                            <td><a href="ssh://root@{{ server[0]['ip'] }}">{{ server[0]['ip'] }}</a></td>
+                        </tr>
+                        <tr>
+                            <td>Created On:</td>
+                            <td>{{ linode['CREATE_DT'] }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div role="tabpanel">
+            <ul class="nav nav-tabs" role="tablist" id="tabs">
+                <li role="presentation" class="active"><a href="#actions" data-toggle="tab">Actions</a></li>
+                <li role="presentation"><a href="#features" data-toggle="tab">Features</a></li>
+                <li role="presentation"><a href="#resize" data-toggle="tab">Resize</a></li>
+                <li role="presentation"><a href="#rename" data-toggle="tab">Rename</a></li>
+                <li role="presentation"><a href="#ptr" data-toggle="tab">PTR</a></li>
+            </ul>
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active fade in" id="actions">
+                    <h4>Actions</h4>
+                    {% if server[0]['state'] == 0 %}
+                    <a class="btn btn-success" href="/start/{{ server[0]['_id'] }}">Start Linode</a><br/><br/>
+                    <a class="btn btn-warning" href="/reboot/{{ server[0]['_id'] }}">Reboot Linode</a><br/><br/>
+                    <a class="btn btn-danger" href="/destroy/{{ server[0]['_id'] }}">Destroy Linode</a><br/><br/>
+                    {% elif server[0]['state'] == 1 %}
+                    <a class="btn btn-warning" href="/shutdown/{{ server[0]['_id'] }}">Shutdown Linode</a><br/><br/>
+                    <a class="btn btn-danger" href="/destroy/{{ server[0]['_id'] }}">Destroy Linode</a><br/><br/>
+                    {% elif server[0]['state'] == 3 %}
+                    {% endif %}
+                </div>
+                <div role="tabpanel" class="tab-pane fade" id="features">
+                    <h4>Features</h4>
+                    <p>There are no features to enable or disable on this Linode.</p>
+                </div>
+                <div role="tabpanel" class="tab-pane fade" id="resize">
+                   <h4>Resize Linode</h4>
+                    <form action="/server/edit/{{ server[0]['_id'] }}/linode/resize" method="post">
+                    <div class="form-group">
+                        <label for="size" class="control-label">New Plan Size</label>
+                            <select class="form-control" name="size">
+                                {% for plan in linode_plans %}
+                                <option value="{{ plan['id'] }}">{{ plan['label'] }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <input class="btn btn-success" type="submit" value="Resize"/>
+                    </form>
+                </div>
+                <div role="tabpanel" class="tab-pane fade" id="rename">
+                    <h4>Rename Linode</h4>
+                    <form action="/server/edit/{{ server[0]['_id'] }}/linode/rename" method="post">
+                        <div class="form-group">
+                            <label for="linode_name" class="control-label">New Linode Name</label>
+                            <input class="form-control" type="text" name="linode_name" placeholder="Linode Name"/>
+                        </div>
+                        <input type="submit" class="btn btn-success" value="Change Name"/>
+                    </form>
+                </div>
+                <div role="tabpanel" class="tab-pane fade" id="ptr">
+                    <h4>Update/Set Linode PTR</h4>
+                    <p>Linode requires that an A record exist for your PTR before it will be accepted. Please be sure to create
+                    an A record for the domain you enter below to point to your Linode's IP.</p>
+                    <form action="/server/edit/{{ server[0]['_id'] }}/linode/ptr" method="post">
+                        <div class="form-group">
+                            <label for="linode_ptr" class="control-label">New Linode PTR</label>
+                            <input class="form-control" type="text" name="linode_ptr" placeholder="example.com"/>
+                        </div>
+                        <input type="submit" class="btn btn-success" value="Submit"/>
+                    </form>
+                </div><!-- tabpanel !-->
+            </div><!-- tab-content !-->
+        </div>
+    </div>
+</div><!-- row !-->
+{% endblock %}

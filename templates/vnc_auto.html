@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-{% extends 'grid.html' %}
+{% extends 'frame.html' %}
 {% block title %}Space - VNC Console ({{ server_name }}){% endblock %}
-{% block head_content %}
+{% block header %}
     <!-- Apple iOS Safari settings -->
     <link rel="stylesheet" href="/static/noVNC/include/base.css" title="plain">
 
@@ -15,7 +15,8 @@
 <h3>Console Session - {{ server_name }}</h3>
 <p>If this is your first time viewing a console, please <a href="https://{{ domain }}:{{ port }}">click here</a> and accept the security warning.</p>
 <p>The password for this VNC console is: {{ server_id }}</p>
-<br/>
+<a href="/server/edit/{{ server_id }}/local" class="btn btn-success">Back</a>
+<br/><br/>
     <div id="noVNC_screen">
             <div id="noVNC_status_bar" class="noVNC_status_bar" style="margin-top: 0px;">
                 <table border=0 width="100%"><tr>

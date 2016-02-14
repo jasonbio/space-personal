@@ -1,0 +1,178 @@
+{% extends 'frame.html' %}
+{% block title %}Space - Create a Server{% endblock %}
+{% block footer %}
+<script src="/static/js/create.js"></script>
+{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="page-header">
+            <h2 class="type">Create a Server</h2>
+        </div>
+    </div>
+</div>
+<div class="row">
+<div class="col-lg-6">
+<div class="well bs-component">
+        <form class="form-horizontal" action="/server/new" method="post" data-toggle="validator" role="form">
+            <fieldset>
+            <div class="form-group">
+                <label for="provider" class="col-lg-2 control-label">Location / Provider</label>
+                <div class="col-lg-10">
+                    <select class="form-control provider_select" name="provider" id="provider_select" required>
+                        <option value="local">Local</option>
+                        <option value="do">DigitalOcean</option>
+                        <option value="linode">Linode</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="server_name" class="col-lg-2 control-label">Server Name</label>
+                <div class="col-lg-10">
+                    <input type="text" class="form-control" name="server_name" id="server_name" placeholder="Server Name">
+                </div>
+            </div>
+            <div class="local">
+            <div class="form-group">
+                <label for="ram" class="col-lg-2 control-label">RAM (MB)</label>
+                <div class="col-lg-10">
+                    <input type="number" class="form-control" name="ram" id="ram" placeholder="RAM (MB)">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="disk_size" class="col-lg-2 control-label">Disk Size (GB)</label>
+                <div class="col-lg-10">
+                    <input type="number" class="form-control" name="disk_size" id="disk_size" placeholder="Disk Size (GB)">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="vcpu" class="col-lg-2 control-label">Virtual CPUs</label>
+                <div class="col-lg-10">
+                    <input type="text" class="form-control" name="vcpu" id="vcpu" placeholder="Virtual CPUs">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="disk_image" class="col-lg-2 control-label">Disk Image</label>
+                <div class="col-lg-10">
+                    <select class="form-control" name="disk_image">
+                        {% for image in images %}
+                        <option value="{{ image['_id']  }}">{{ image['name'] }}</option>
+                        {% endfor %} 
+                    </select>
+                </div>
+            </div>
+            </div><! -- local !-->
+            <div class="do">
+            <div class="form-group">
+                  <label for="do_region" class="col-lg-2 control-label">Region</label>
+                  <div class="col-lg-10">
+                        <select class="form-control" name="do_region">
+                            {% for region in do_regions %}
+                            <option value="{{ region['slug'] }}">{{ region['name'] }}</option>
+                            {% endfor %}
+                        </select>
+                  </div>
+            </div>
+            <div class="form-group">
+                <label for="do_plan" class="col-lg-2 control-label">Plan Size</label>
+                <div class="col-lg-10">
+                    <select class="form-control" name="do_plan">
+                        {% for plan in do_sizes %}
+                        <option value="{{ plan['slug'] }}">{{ plan['memory'] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="do_image" class="col-lg-2 control-label">Image</label>
+                <div class="col-lg-10">
+                    <select class="form-control" name="do_image">
+                        {% for doimage in do_images %}
+                        <option value="{{ doimage['id'] }}">{{ doimage['slug'] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="ssh_key" class="col-lg-2 control-label">SSH Key</label>
+                <div class="col-lg-10">
+                    <select class="form-control" name="ssh_key">
+                        <option value="0">None</option>
+                        {% for key in do_sshkeys %}
+                        <option value="{{ key['id'] }}">{{ key['name'] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="backups" class="col-lg-2 control-label">Enable Backups</label>
+                    <input type="checkbox" name="backups"/>
+            </div>
+            <!--
+            <div class="form-group">
+
+            </div>
+            <div class="form-group">
+
+            </div>!-->
+            </div><!-- do !-->
+            <div class="linode">
+            <div class="form-group">
+                <label for="linode_facility" class="col-lg-2 control-label">Facility</label>
+                <div class="col-lg-10">
+                    <select class="form-control" name="linode_facility">
+                        {% for facility in linode_facilities %}
+                        <option value="{{ facility['id'] }}">{{ facility['location'] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="linode_plan" class="col-lg-2 control-label">Plan</label>
+                <div class="col-lg-10">
+                    <select class="form-control" name="linode_plan">
+                        {% for plan in linode_plans %}
+                        <option value="{{ plan['id'] }}">{{ plan['label'] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="linode_kernel" class="col-lg-2 control-label">Kernel</label>
+                <div class="col-lg-10">
+                    <select class="form-control" name="linode_kernel">
+                    {% for kernel in linode_kernels %}
+                    <option value="{{ kernel['id'] }}">{{ kernel['label'] }}</option>
+                    {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="linode_distribution" class="col-lg-2 control-label">Distribution</label>
+                <div class="col-lg-10">
+                    <select class="form-control" name="linode_distribution">
+                    {% for dist in linode_dists %}
+                    <option value="{{ dist['id'] }}">{{ dist['label'] }}</option>
+                    {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="linode_root" class="col-lg-2 control-label">Root Password</label>
+                <div class="col-lg-10">
+                    <input class="form-control" type="password" name="linode_root" placeholder="Root password"/>
+                </div>
+            </div> 
+            </div>
+            <div class="form-group">
+                    <div class="col-lg-10 col-lg-offset-2">
+                      <button type="submit" class="btn btn-success">Create Server</button>
+                    </div>
+            </div>
+            </fieldset>
+        </form>
+    </div>
+</div>
+</div>
+</div>
+{% endblock %}

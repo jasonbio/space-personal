@@ -1,0 +1,228 @@
+{% extends 'frame.html' %}
+{% block title %}Space - Edit Droplet {{ server[0]['name'] }}{% endblock %}
+{% block header %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/droplet.css') }}"/>
+{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="page-header">
+        <h2 class="type"><img src="{{ url_for('static', filename='images/do_logo.png') }}" title="DigitalOcean" alt="DigitalOcean"/>&nbsp;Droplet - {{ server[0]['name'] }}</h2>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h4 class="panel-title">Details</h4>
+            </div>
+            <div class="row">
+            <div class="col-md-12">
+                <table class="table table-user-information table-striped">
+                    <tbody>
+                        <tr>
+                            <td>Status:</td>
+                            <td>{{ droplet.status }}</td>
+                        </tr>
+                        <tr>
+                            <td>Plan:</td>
+                            <td>{{ droplet.size_slug }}</td>
+                        </tr>
+                        <tr>
+                            <td>Region:</td>
+                            <td>{{ droplet.region['name'] }}</td>
+                        </tr>
+                        <tr>
+                            <td>Distribution:</td>
+                            <td>{{ droplet.image['slug'] }}</td>
+                        </tr>
+                        <tr>
+                            <td>Kernel:</td>
+                            <td>{{ droplet.kernel['name'] }}</td>
+                        </tr>
+                        <tr>
+                            <td>RAM:</td>
+                            <td>{{ droplet.memory }}MB</td>
+                        </tr>
+                        <tr>
+                            <td>Storage:</td>
+                            <td>{{ droplet.disk }}GB</td>
+                        </tr>
+                        <tr>
+                            <td>vCPU:</td>
+                            <td>{{ droplet.vcpus }}</td>
+                        </tr>
+                        {% if droplet.networks['v4']|length > 0 %}
+                        <tr>
+                            <td>IPv4 Settings</td>
+                            <td>
+                                Type: {{ droplet.networks['v4'][0]['type'] }}<br/>
+                                Address: {{ droplet.networks['v4'][0]['ip_address'] }}<br/>
+                                Netmask: {{ droplet.networks['v4'][0]['netmask'] }}<br/>
+                                Gateway: {{ droplet.networks['v4'][0]['gateway'] }}<br/>
+                                {% if droplet.networks['v4']|length >= 2 %}
+                                <hr/>
+                                Type: {{ droplet.networks['v4'][1]['type'] }}<br/>
+                                Address: {{ droplet.networks['v4'][1]['ip_address'] }}<br/>
+                                Netmask: {{ droplet.networks['v4'][1]['netmask'] }}<br/>
+                                Gateway: {{ droplet.networks['v4'][1]['gateway'] }}<br/>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% if 'ipv6' in droplet.features %}
+                        <tr>
+                            <td>IPv6 Settings</td>
+                            <td>
+                                Address: {{ droplet.networks['v6'][0]['ip_address'] }}<br/>
+                                Netmask: {{ droplet.networks['v6'][0]['netmask'] }}<br/>
+                                Gateway: {{ droplet.networks['v6'][0]['gateway'] }}<br/>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                            <td>Features:</td>
+                            <td>
+                            {% for feature in droplet.features %}
+                            {{ feature }}<br/>
+                            {% endfor %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Created On:</td>
+                            <td>{{ droplet.created_at }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div role="tabpanel">
+            <ul class="nav nav-tabs" role="tablist" id="tabs">
+                <li role="presentation" class="active"><a href="#actions" data-toggle="tab">Actions</a></li>
+                <li role="presentation"><a href="#features" data-toggle="tab">Features</a></li>
+                <li role="presentation"><a href="#resize" data-toggle="tab">Resize</a></li>
+                <li role="presentation"><a href="#rename" data-toggle="tab">Rename</a></li>
+                <li role="presentation"><a href="#snapshot" data-toggle="tab">Snapshot</a></li>
+                <li role="presentation"><a href="#restore" data-toggle="tab">Restore</a></li>
+                <li role="presentation"><a href="#rebuild" data-toggle="tab">Rebuild</a></li>
+                <li role="presentation"><a href="#kernel" data-toggle="tab">Kernel</a></li>
+            </ul>
+            <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active fade in" id="actions">
+                <h4>Actions</h4>
+                {% if server[0]['state'] == 0 %}
+                <a class="btn btn-success" href="/start/{{ server[0]['_id'] }}">Start Droplet</a><br/><br/>
+                <a class="btn btn-warning" href="/reboot/{{ server[0]['_id'] }}">Reboot Droplet</a><br/><br/>
+                <a class="btn btn-danger" href="/destroy/{{ server[0]['_id'] }}">Destroy Droplet</a><br/><br/>
+                {% elif server[0]['state'] == 1 %}
+                <a class="btn btn-warning" href="/shutdown/{{ server[0]['_id'] }}">Shutdown Droplet</a><br/><br/>
+                <a class="btn btn-info" target="_blank" href="https://cloud.digitalocean.com/droplets/{{ server[0]['id'] }}/console">Access Console</a><br/><br/>
+                <a class="btn btn-danger" href="/destroy/{{ server[0]['_id'] }}">Destroy Droplet</a><br/><br/>
+                {% elif server[0]['state'] == 3 %}
+                {% endif %}
+                <a class="btn btn-warning" href="/server/edit/{{ server[0]['_id'] }}/droplet/reset">Reset Root Password</a><br/><br/>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="features">
+                <h4>Features</h4>
+                {% set check = 0 %}
+                {% if "backups" in droplet.features %}
+                <a class="btn btn-danger" href="/server/edit/{{ server[0]['_id'] }}/droplet/disablebackups">Disable Backups</a><br/><br/>
+                {% set check =1 %}
+                {% endif %}
+                {% if "ipv6" not in droplet.features %}
+                <a class="btn btn-success" href="/server/edit/{{ server[0]['_id'] }}/droplet/ipv6">Enable IPv6</a><br/><br/>
+                {% set check = 1 %}
+                {% endif %}
+                {% if "private_networking" not in droplet.features %}
+                <a class="btn btn-success" href="/server/edit/{{ server[0]['_id'] }}/droplet/private">Enable Private Networking</a><br/><br/>
+                {% set check = 1 %}
+                {% endif %}
+                {% if check == 0 %}
+                <p>There are no features to enable or disable on this droplet.</p>
+                {% endif %}
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="rename">
+                <h4>Rename Droplet</h4>
+                <form action="/server/edit/{{ server[0]['_id'] }}/droplet/rename" method="post">
+                    <div class="form-group">
+                        <label for="name" class="control-label">New Droplet Name</label>
+                        <input class="form-control" type="text" name="name" placeholder="Droplet Name"/>
+                    </div>
+                    <input class="btn btn-success" type="submit" value="Change Name"/>
+                </form>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="snapshot">
+                <h4>Take Snapshot</h4>
+                <form action="/server/edit/{{ server[0]['_id'] }}/droplet/snapshot" method="post">
+                    <div class="form-group">
+                        <label for="snapshot_name" class="control-label">Snapshot Name</label>
+                        <input class="form-control" type="text" name="snapshot_name" placeholder="Name of new snapshot"/>
+                    </div>
+                    <input class="btn btn-success" type="submit" value="Take Snapshot"/>
+                </form>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="restore">
+                <h4>Restore Snapshot</h4>
+                <form action="/server/edit/{{ server[0]['_id'] }}/droplet/restoresnapshot" method="post">
+                    <div class="form-group">
+                        <label for="restore_snapshot_name" class="control-label">Snapshot</label>
+                        <select class="form-control" name="restore_snapshot_name">
+                            {% for snapshot in do_snapshots %}
+                            <option value="{{ snapshot['id'] }}">{{ snapshot['name'] }}</option>
+                            {% endfor %}
+                        </select>
+                        </div>
+                        <input class="btn btn-success" type="submit" value="Restore"/>
+                </form>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="rebuild">
+                <h4>Rebuild</h4>
+                <form action="/server/edit/{{ server[0]['_id'] }}/droplet/rebuild" method="post">
+                    <div class="form-group">
+                        <label for="rebuild_image_id" class="control-label">Image</label>
+                        <select class="form-control" name="rebuild_image_id">
+                            {% for image in do_images %}
+                            <option value="{{ image['id'] }}">{{ image['slug'] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <input class="btn btn-success" type="submit" value="Rebuild"/>
+                </form>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="kernel">
+                <h4>Change Kernel</h4>
+                <form action="/server/edit/{{ server[0]['_id'] }}/droplet/kernel" method="post">
+                    <div class="form-group">
+                        <label for="new_kernel" class="control-label">New Kernel</label>
+                        <select class="form-control" name="new_kernel">
+                        {% for kernel in kernels %}
+                            <option value="{{ kernel['id'] }}">{{ kernel['name'] }}</option>
+                        {% endfor %}
+                        </select>
+                    </div>
+                    <input class="btn btn-success" type="submit" value="Change Kernel"/>
+                </form>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="resize">
+                <h4>Resize Droplet</h4>
+                <form action="/server/edit/{{ server[0]['_id'] }}/droplet/resize" method="post">
+                    <div class="form-group">
+                        <label for="size" class="control-label">New Plan Size</label>
+                        <select class="form-control" name="size">
+                            {% for size in do_sizes %}
+                            <option value="{{ size['slug'] }}">{{ size['memory'] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <input class="btn btn-success" type="submit" value="Resize"/>
+                </form>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

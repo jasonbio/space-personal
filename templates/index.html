@@ -1,154 +1,64 @@
-{% extends 'grid.html' %}
+{% extends 'frame.html' %}
 {% block title %}Space - The Virtualization Control Panel{% endblock %}
-{% block head_content %}
+{% block header %}
 <script type="text/javascript" src="/static/js/index_graphs.js"></script>
 {% endblock %}
 {% block content %}
-<h3>Servers</h3>
-<table class="table sortable">
-    <thead>
-    <tr>
-        <th>Name</th>
-        <th>RAM</th>
-        <th>VCPU</th>
-        <th>Disk Size</th>
-        <th>Image</th>
-        <th>State</th>
-        <th>Actions</th>
-    </tr>
-    </thead>
-    {% if servers %}
-    {% for server in servers %}
-    <tr>
-        <td><a href="/edit/{{ server['_id'] }}">{{ server['name'] }}</a></td>
-        <td>{{ server['ram'] }} MB</td>
-        <td>{{ server['vcpu'] }}</td>
-        <td>{{ server['disk_size'] }} GB</td>
-        <td>{{ server['disk_image'] }}</td>
-        <td>
-        {% if server['state'] == 1 %}
-        <p><span class="label label-success">On</span></p>
-        {% else %}
-        <p><span class="label label-danger">Off</span></p>
-        {% endif %}
-        </td>
-        <td>
-        {% if server['state'] == 1 %}
-        <a title="Shutdown" class="btn btn-warning btn-xs" href="/shutdown/{{ server['_id'] }}"><span class="glyphicon glyphicon-off"></span></a>&nbsp;
-        <a title="Reboot" class="btn btn-warning btn-xs" href="/reboot/{{ server['_id'] }}"><span class="glyphicon glyphicon-refresh"></span></a>&nbsp;
-        <a title="Console" class="btn btn-primary btn-xs" href="/console/{{ server['_id'] }}"><span class="glyphicon glyphicon-tasks"></span></a>&nbsp;
-        {% elif server['state'] == 0 %}
-        <a title="Start" class="btn btn-success btn-xs" href="/start/{{ server['_id'] }}"><span class="glyphicon glyphicon-play"></span></a>&nbsp;
-        {% endif %}
-        <a title="Destroy" class="btn btn-danger btn-xs" onClick="return confirm('Are you sure you want to delete this VM? This action cannot be undone.');" href="/destroy/{{ server['_id'] }}"><span class="glyphicon glyphicon-fire"></span></a>
-        {% if server['inconsistent'] == 1 %}
-        <span class="glyphicon glyphicon-exclamation-sign" data-toggle="tooltip" data-placement="right" title="Server is in an inconsistent state"></span>
-        {% endif %}
-        {% if server['blocked'] == 1 %}
-        <span class="glyphicon glyphicon-remove-sign" data-toggle="tooltip" data-placement="right" title="Server is blocked, wait for processing jobs to complete."></span>
-        {% endif %}
-        </td>
-    </tr>
-    {% endfor %}
-    {% endif %}
-</table>
-<hr/>
-<div class="row">
-    <div class="col-md-6">
-        <h3>Make a New Server</h3>
-        <form action="/create" method="post" data-toggle="validator" role="form">
-            <div class="form-group">
-                <label for="name" class="control-label">Server Name</label>
-                <input class="form-control" type="text" name="name" placeholder="Server Name" required/>
-                <span class="help-block with-errors"></span>
-            </div>
-            <div class="form-group">
-                <label for="ram" class="control-label">RAM Amount (MB)</label>
-                <input class="form-control" type="number" name="ram" placeholder="RAM in MB" required data-type="number" min="1"/>
-                <span class="help-block with-errors"></span>
-            </div>
-            <div class="form-group">
-                <label for="disk_size" class="control-label">Disk Size (GB)</label>
-                <input class="form-control" type="number" name="disk_size" placeholder="Disk Size in GB" required data-type="number" min="1"/>
-                <span class="help-block with-errors"></span>
-            </div>
-            <div class="form-group">
-                <label for="vcpu" class="control-label">vCPUs</label>
-                <input class="form-control" type="number" name="vcpu" placeholder="Number of VCPUs" required data-type="number" min="1"/>
-                <span class="help-block with-errors"></span>
-            </div>
-            <div class="form-group">
-                <label for="image" class="control-label">Distribution Image</label>
-                <select class="form-control" name="image" required>
-                {% for image in images %}
-                    <option value="{{ image['_id'] }}">{{ image['name'] }}</option>
-                {% endfor %}
-                </select>
-            </div>
-                <input class="btn btn-success" type="submit" value="Make it"/>
-        </form>
-    </div>
-    <div class="col-md-6">
-        <h3>CPU Statistics</h3>
-        {% if stats %}
-        <div class="progress">
-            <div class="progress-bar" role="progressbar" aria-valuenow="{{ stats[0]['cpu'] }}" aria-valuemin="0" aria-valuemax="100" style="min-width:3em; width:{{ stats[0]['cpu'] }}%;">
-                {{ stats[0]['cpu'] }}% CPU
+    <div class="row">
+        <div class="col-md-12">
+            <div class="page-header">
+                <h2 class="type">Dashboard</h2>
             </div>
         </div>
-        {% endif %}
-        <div id="cpu"></div>
     </div>
-</div><!-- row !-->
-<hr/>
-<div class="row">
-    <div class="col-md-6">
-        <h3>Memory Stats</h3>
-        {% if stats %}
-        <div class="progress">
-        <div class="progress-bar" role="progressbar" aria-valuenow="{{ stats[0]['memory_used'] }}" aria-valuemin="0" aria-valuemax="{{ stats[0]['total_memory'] }}" style="min-width:3em; width:{{ (stats[0]['memory_used']/stats[0]['total_memory'])*100 }}%;">
-                {{ stats[0]['memory_used'] }} MB
-            </div>  
+    <div class="row">
+        <div class="col-md-6">
+            <div class="panel panel-shortcuts">
+                <div class="panel-heading">
+                    <h4>Shortcuts</h4>
+                </div>
+                <ul class="list-group">
+                    <a class="list-group-item" href="/server/new"><span class="glyphicon glyphicon-plus"></span>&nbsp;&nbsp;Create a new server</a>
+                    <a class="list-group-item" href="/server/active"><span class="glyphicon glyphicon-eye-open"></span>&nbsp;&nbsp;View my servers</a>
+                    <a class="list-group-item" href="/networking"><span class="glyphicon glyphicon-compressed"></span>&nbsp;&nbsp;Manage Networking</a>
+                    <a class="list-group-item" href="/utils/import_images"><span class="glyphicon glyphicon-picture"></span>&nbsp;&nbsp;Import New Image</a>
+                    <a class="list-group-item" href="/settings"><span class="glyphicon glyphicon-wrench"></span>&nbsp;&nbsp;Change a system setting</a>
+                </ul>
+            </div>
         </div>
-        {% endif %}
-        <div id="memory"></div>
-    </div>
-    <div class="col-md-6">
-    {% if stats %}
-    <h3>IOWait</h3>
-    <div class="progress">
-        <div class="progress-bar" role="progressbar" aria-valuenow="{{ stats[0]['iowait'] }}" aria-valuemin="0" aria-valuemax="100" style="min-width:3em; width:{{ stats[0]['iowait'] }}%;">
-            {{ stats[0]['iowait'] }}% 
+        <div class="col-md-6">
+            <div class="panel {% if all_good == 1 %}panel-success{% else %}panel-danger{% endif %}">
+                <div class="panel-heading">
+                    <h4>System Status</h4>
+                </div>
+                <ul class="list-group">
+                    {% for service in services %}
+                    <a class="list-group-item" href="#">
+                    {% if service['status'] == 1 %}
+                    <span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;{{ service['_id'] }} Running</a>
+                    {% else %}
+                    <span class="glyphicon glyphicon-remove"></span>&nbsp;&nbsp;{{ service['_id'] }} <strong>Not Running</strong></a>
+                    {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
     </div>
-    {% endif %}
-    <div id="iowait"></div>
+    <hr/>
+    <div class="row">
+        <div class="col-md-4">
+            <h4>Memory Usage</h4>
+            <div id="memory"></div>
+        </div>
+        <div class="col-md-4">
+            <h4>CPU Usage</h4>
+            <div id="cpu"></div>
+        </div>
+        <div class="col-md-4">
+            <h4>IOwait</h4>
+            <div id="iowait"></div>
+        </div>
     </div>
 </div>
-<h3>Errors in the Past 24 Hours</h3>
-<table class="table sortable">
-    <thead>
-    <tr>
-        <th>Date</th>
-        <th>Level</th>
-        <th>Message</th>
-    </tr>
-    </thead>
-    {% for event in log %}
-    <tr>
-        <td>{{ event.date }}</td>
-        <td>
-        {% if event['level'] == 1 %}
-        <p><span class="label label-primary">Debug</span></p>
-        {% elif event['level'] == 2 %}
-        <p><span class="label label-warning">Warning</span></p>
-        {% else %}
-        <p><span class="label label-danger">Error</span></p>
-        {% endif %}
-        </td>
-        <td>{{ event['message'] }}</td>
-    </tr>
-    {% endfor %}
-</table>
 <br/><br/><br/>
 {% endblock %}

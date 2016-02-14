@@ -1,0 +1,85 @@
+@charset "utf-8";
+/* CSS Document */
+
+.navbar-nav>li>a {
+    padding-top:32px !important;
+    font-size:18px;
+}
+
+.navbar {
+    margin-bottom:0px;  
+}
+
+.label-as-badge {
+    border-radius: 1em;
+}
+
+.primary {
+    width:90%;
+    margin-left:auto;
+    margin-right:auto; 
+    margin-bottom:5em;
+}
+
+.alert {
+    margin-top:10px;    
+}
+
+.panel-shortcuts {
+    background:#FFA161;
+    border-color:#FFF;
+}
+
+.panel-shortcuts>.panel-heading {
+    border-color:#FFF;  
+    color:#FFF;
+}
+
+.table-server {
+    font-size:18px; 
+}
+
+@media (max-width: 907px) {
+    .navbar {
+        padding-bottom:1.5em;
+    }
+    .navbar-toggle {
+        top:1em;
+    }
+    .navbar-header {
+        float: none;
+    }
+    .navbar-toggle {
+        display: block;
+    }
+    .navbar-collapse {
+        border-top: 1px solid transparent;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+    .navbar-collapse.collapse {
+        display: none!important;
+    }
+    .navbar-nav {
+        float: none!important;
+        margin: 7.5px -15px;
+    }
+    .navbar-nav>li {
+        float: none;
+    }
+    .navbar-nav>li>a {
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+    .navbar-text {
+        float: none;
+        margin: 15px 0;
+    }
+    /* since 3.1.0 */
+    .navbar-collapse.collapse.in {
+        display: block!important;
+    }
+    .collapsing {
+        overflow: hidden!important;
+    }
+}
+

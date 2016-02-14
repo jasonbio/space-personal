@@ -1,0 +1,127 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>{% block title %}Dashboard{% endblock %}</title>
+    <link rel="apple-touch-icon" sizes="57x57" href="{{ url_for('static', filename='images/favicons/apple-touch-icon-57x57.png') }}">
+    <link rel="apple-touch-icon" sizes="60x60" href="{{ url_for('static', filename='images/favicons/apple-touch-icon-60x60.png') }}">
+    <link rel="apple-touch-icon" sizes="72x72" href="{{ url_for('static', filename='images/favicons/apple-touch-icon-72x72.png') }}">
+    <link rel="apple-touch-icon" sizes="76x76" href="{{ url_for('static', filename='images/favicons/apple-touch-icon-76x76.png') }}">
+    <link rel="apple-touch-icon" sizes="114x114" href="{{ url_for('static', filename='images/favicons/apple-touch-icon-114x114.png') }}">
+    <link rel="apple-touch-icon" sizes="120x120" href="{{ url_for('static', filename='images/favicons/apple-touch-icon-120x120.png') }}">
+    <link rel="apple-touch-icon" sizes="144x144" href="{{ url_for('static', filename='images/favicons/apple-touch-icon-144x144.png') }}">
+    <link rel="apple-touch-icon" sizes="152x152" href="{{ url_for('static', filename='images/favicons/apple-touch-icon-152x152.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='images/favicons/apple-touch-icon-180x180.png') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicons/favicon-32x32.png') }}" sizes="32x32">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicons/android-chrome-192x192.png') }}" sizes="192x192">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicons/favicon-96x96.png') }}" sizes="96x96">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicons/favicon-16x16.png') }}" sizes="16x16">
+    <link rel="manifest" href="{{ url_for('static', filename='images/favicons/android-chrome-manifest.json') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicons/favicon.ico') }}">
+    <meta name="msapplication-TileColor" content="#00aba9">
+    <meta name="msapplication-TileImage" content="{{ url_for('static', filename='images/favicons/mstile-144x144.png') }}">
+    <meta name="msapplication-config" content="{{ url_for('static', filename='images/favicons/browserconfig.xml') }}">
+    <meta name="theme-color" content="#ffffff">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/confirm.js') }}"></script>
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet"/>
+    <link href="{{ url_for('static', filename='css/space.css') }}" rel="stylesheet"/>
+{% block header %}
+{% endblock %}
+</head>
+<body>
+{% block navigation %}
+{% include 'navigation.html' %}
+{% endblock %}
+<div class="container primary">
+    <div class="row">
+        {% if error %}
+        <div class="col-md-12">
+            <div class="alert alert-dismissable alert-danger">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                {{ error|safe }}
+            </div>
+        </div>
+        {% endif %}
+        {% if message %}
+        <div class="col-md-12">
+            <div class="alert alert-dismissable alert-success">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                {{ message|safe }}
+            </div>
+        </div>
+        {% endif %}
+        {% if request.args.get('error') %}
+        <div class="col-md-12">
+            <div class="alert alert-dismissable alert-danger">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <h4>Error</h4>
+                {% if request.args.get('error') == "1" %}
+                Action did not complete. Please check the <a href="/log?date=day&level=error" class="alert-link">logs</a> for more information.
+                {% elif request.args.get('error') == "2" %}
+                Droplet must be powered off to do that, please power your droplet off.
+                {% elif request.args.get('error') == "3" %}
+                This is a local machine, not a Droplet/Linode, please use the appropriate links>
+                {% elif request.args.get('error') == "4" %}
+                Server creation failed. Please add IP addresses.
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+        {% if request.args.get('message') %}
+        <div class="col-md-12">
+            <div class="alert alert-dismissable alert-success">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <h4>Message</h4>
+                {% if request.args.get('message') == "1" %}
+                API key successfully updated.
+                {% elif request.args.get('message') == "2" %}
+                Settings successfully update.
+                {% elif request.args.get('message') == "3" %}
+                Action successful.
+                {% elif request.args.get('message') == "4" %}
+                Action successfully submitted to provider.
+                {% elif request.args.get('message') == "5" %}
+                Server successfully created.
+                {% elif request.args.get('message') == "6" %}
+                Object successfully added.
+                {% elif request.args.get('message') == "7" %}
+                Object successfully deleted.
+                {% elif request.args.get('message') == "8" %}
+                Server successfully deleted.
+                {% elif request.args.get('message') == "9" %}
+                Action stated.
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+        {% if request.args.get('first_time') %}
+        <div class="col-md-12">
+            <div class="alert alert-dismissable alert-warning">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <h4>Welcome to Space!</h4>
+                <p>It looks like this is your first time logging in! If that is the case, you should probably run through the following steps before making your first server:</p>
+                <ol>
+                    <li>Add an IP range on the <a href="/networking" class="alert-link">networking</a> page</li>
+                    <li>Add some images on the <a href="/images" class="alert-link">images</a> page</li>
+                    <li>(Optional) If you are going to add Linodes/Droplets, add your API keys on the <a href="/settings" class="alert-link">settings</a> page</li>
+                    <li><a href="/server/new" class="alert-link">Make</a> your first server or import some <a href="/utils/import_droplets" class="alert-link">Droplets</a> or <a href="/utils/import_linodes" class="alert-link">Linodes</a></li>
+                </ol>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+{% block content %}
+{% endblock %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/validator.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script src="{{ url_for('static', filename='js/moment.min.js') }}"></script>
+<script src='/static/js/bootstrap-sortable.js'></script>
+{% block footer %}
+{% endblock %}
+</body>
+</html>
+

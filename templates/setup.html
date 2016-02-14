@@ -1,21 +1,34 @@
-{% extends 'grid.html' %}
+{% extends 'frame.html' %}
 {% block title %}Space - Welcome/Setup{% endblock %}
+{% block header %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/setup.css') }}">
+{% endblock %}
 {% block content %}
 {% block navigation %}{% endblock %}
-<div style="margin-left:auto; margin-right:auto; text-align:center; margin-bottom:2em;"><img src="/static/images/logo_medium.png"/></div>
+<div class="logo"><img src="/static/images/logo_login.png"/></div>
+<div class="well">
 <h2>Setup</h2>
 <hr/>
 <h3>Welcome to Space!</h3>
-<p>Space panel is a simple control panel that will allow you to control your virtualized machines easily from this web interface. To get started, please complete the configuration options below.</p>
+<p>Space Panel is a simple control panel that will allow you to control your virtualized machines easily from this web interface. To get started, please complete the configuration options below.</p>
 <hr/>
 <form action="/setup" method="post" data-toggle="validator" role="form">
 <h3>1. The system type</h3>
+<p>First, select the distribution on this host.</p>
+    <div class="form-group">
+        <label class="control-label">Distribution</label>
+        <select class="form-control" name="distribution">
+            <option value="centos">CentOS</option>
+            <option value="debian">Debian</option>
+            <option value="ubuntu">Ubuntu</option>
+        </select>
+    </div>
 <p>First, please select the type of hypervisor your machine will be running (KVM or Xen).</p>
     <div class="form-group">
         <label class="control-label">System Type</label>
         <select class="form-control" name="system_type">
             <option value="qemu">QEMU</option>
-            <option value="xen">Xen</option>
+            <!--<option value="xen">Xen</option>!-->
         </select>
     </div>
 <hr/>
@@ -84,8 +97,7 @@
         <input class="form-control" type="text" name="pem_location" value="/srv/space/static/noVNC/YOUR_CERTIFICATE.pem"/>
         <span class="help-block">This is the location of the certificate used by noVNC (pem). By default, this is located in static/noVNC within the space directory.</span>
     </div> 
-<h3>Fire!</h3>
-<p>Looks good, fire!</p>
-    <input class="btn btn-success" type="submit" value="Fire!"/>
+    <input class="btn btn-success wide" type="submit" value="Complete Setup"/>
 </form>
+</div>
 {% endblock %}

@@ -1,0 +1,25 @@
+body {
+    background-color:#333333;
+}
+
+.small {
+    margin-left:auto;
+    margin-right:auto;
+    width:50% !important;
+}
+
+.wide {
+    width:100%;
+}
+
+.center {
+    text-align:center;
+    margin-left:auto;
+    margin-right:auto;
+    padding:4em;
+    padding-left:3em;
+}
+
+.space-well {
+    background-color:#FFA161;
+}
