@@ -1,6 +1,6 @@
 Flask==0.10.1
 Jinja2==2.7.3
-PyYAML==3.10
+PyYAML==5.4
 Pygments==1.1.1
 Werkzeug==0.9.6
 bson==0.3.3
