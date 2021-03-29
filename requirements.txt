@@ -1,7 +1,7 @@
 Flask==0.10.1
 Jinja2==2.7.3
 PyYAML==3.10
-Pygments==1.1.1
+Pygments==2.7.4
 Werkzeug==0.9.6
 bson==0.3.3
 netaddr==0.7.13
