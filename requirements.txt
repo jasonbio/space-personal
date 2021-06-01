@@ -7,7 +7,7 @@ bson==0.3.3
 netaddr==0.7.13
 pymongo==2.7.2
 urlgrabber==3.9.1
-urllib3==1.5
+urllib3==1.26.5
 virtinst==0.600.0
 celery==3.1.17
 python-crontab==1.9.2
