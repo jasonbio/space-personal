@@ -9,6 +9,6 @@ pymongo==2.7.2
 urlgrabber==3.9.1
 urllib3==1.5
 virtinst==0.600.0
-celery==3.1.17
+celery==5.2.2
 python-crontab==1.9.2
 gunicorn==19.2.1
